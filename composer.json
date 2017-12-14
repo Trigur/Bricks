@@ -1,0 +1,28 @@
+{
+  "name": "trigur/bricks",
+  "description": "ImageCMS module",
+  "keywords": [
+    "ImageCMS",
+    "module"
+  ],
+  "homepage": "https://github.com/Trigur/bricks",
+  "type": "imagecms-module",
+
+  "extra": {
+    "installer-name": "bricks"
+  },
+  "require": {
+    "php": ">=5.5",
+    "ext-curl": "*",
+    "composer/installers": "^1.0",
+    "trigur/trigurpackage": "^0.3"
+  },
+  "authors": [
+      {
+        "name": "Trigur",
+        "email": "trigur@yandex.ru",
+        "homepage": "https://github.com/Trigur"
+      }
+  ],
+  "minimum-stability": "stable"
+}

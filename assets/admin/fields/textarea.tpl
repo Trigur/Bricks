@@ -1,0 +1,1 @@
+<textarea name="{$name}" id="{$id}" class="elRTE">{$value}</textarea>

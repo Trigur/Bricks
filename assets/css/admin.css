@@ -1,0 +1,50 @@
+.bricks-fields-table th,
+.bricks-fields-table td {
+  border-left: 1px solid #dfdfdf;
+  box-sizing: border-box;
+  width: calc(33.3333% - 24px);
+}
+
+.bricks-fields-table th:last-child,
+.bricks-fields-table td:last-child {
+  width: 72px;
+}
+
+.bricks-fields-table input,
+.bricks-fields-table select {
+  width: 100%;
+}
+
+.bricks-fields-table-proto {
+  display: none;
+}
+
+.bricks-th-select {
+  white-space: nowrap;
+}
+
+.bricks-add-btn {
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.bricks-add-th-title {
+  line-height: 28px;
+}
+
+.bricks-group-add-form {
+  margin-bottom: 0;
+}
+
+.bricks-group-add-form table {
+  width: auto !important;
+}
+
+.bricks-group-add-form td{
+  padding: 0;
+  border: none;
+}
+
+.bricks-group-add-form td:not(:first-child) {
+  padding-left: 15px;
+}
