@@ -24,7 +24,7 @@ class BricksComplexModel extends CI_Model
      * @return array
      */
 
-    public function get($type, $id, $groupName = false)
+    public function getByContent($type, $id, $groupName = false)
     {
         $query = $this->db
             ->from(static::$relationsTable . ' t1')
@@ -39,6 +39,19 @@ class BricksComplexModel extends CI_Model
                 ->join(static::$groupsTable . ' t4', 't1.group_id = t4.id')
                 ->where('t4.name', $groupName);
         }
+
+        return $query->get()->result_array();
+    }
+
+
+    public function getByGroup($groupName = false)
+    {
+        $query = $this->db
+            ->from(static::$dataTable . ' t1')
+            ->join(static::$schemasTable . ' t2', 't1.schema_id = t2.id')
+            ->join(static::$groupsTable . ' t3', 't1.group_id = t3.id')
+            ->select('t1.name, t1.title, t1.fields, t2.name as tpl')
+            ->where('t3.name', $groupName);
 
         return $query->get()->result_array();
     }
