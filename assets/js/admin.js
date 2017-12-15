@@ -250,6 +250,7 @@
       container: tbody,
       afterAdd: function(row, data){
         var groupSelect = row.querySelector(selectors.groupSelect);
+        if (! groupSelect) return;
 
         [].forEach.call(groupSelect.options, function(option, index){
           if (option.value === data.group) {
