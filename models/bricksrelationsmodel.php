@@ -39,7 +39,7 @@ class BricksRelationsModel extends CI_Model {
                 'item_id'   => $itemId,
                 'item_type' => $itemType,
                 'brick_id'  => $brickData['id'],
-                'group_id'  => $brickData['group_id'],
+                'group_id'  => $brickData['group_id'] ?: '',
                 'position'  => $position,
             ];
 
