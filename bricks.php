@@ -22,11 +22,18 @@ class Bricks extends MY_Controller
     use ArrayMethodsTrait;
 
 
-    /*
-        Методы валидации.
-    */
+    /**
+     *  Методы валидации.
+     */
 
     use ValidationMethodsTrait;
+
+
+    /**
+     *  Соль для ключа кеша.
+     */
+
+    private static $cacheSalt = 'Bricks';
 
     public function __construct() {
         parent::__construct();
@@ -40,6 +47,28 @@ class Bricks extends MY_Controller
 
 
     /**
+     *  Кэширование вызовов
+     */
+
+    public function __call($methodName, $arguments)
+    {
+        $methodName = '_' . $methodName;
+
+        if (!method_exists($this, $methodName) || empty($arguments)) return;
+
+        $cacheKey = md5(json_encode($arguments, JSON_UNESCAPED_UNICODE) . static::$cacheSalt);
+
+        if (($result = $this->cache->fetch($cacheKey)) === false) {
+            $result = call_user_func_array([$this, $methodName], $arguments);
+
+            $this->cache->store($cacheKey, $result);
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Получение блока по названию.
      *
      * @param array $name - название блока
@@ -48,7 +77,47 @@ class Bricks extends MY_Controller
      * @return string (html) || null
      */
 
-    public function _getBrickByName($name, $data = null)
+    public function __getBrickByName($name, $data = null)
+    {
+        return $this->_getBy('name', $name);
+    }
+
+
+    /**
+     * Получение групп блоков безотносительно к контенту.
+     *
+     * @param string $groupName - название группы блоков
+     * @param array  $data      - массив с дополнительными данными для блока
+     * @param string $prefix    - html-префикс при рендере блока
+     * @param string $suffix    - html-суффикс при рендере блока
+     *
+     * @return string (html) || null
+     */
+
+    public function __getBricksByGroup($groupName, $data = null, $prefix, $suffix)
+    {
+        $bricks = $this->load->model('BricksComplexModel')->getByGroup($groupName);
+
+        foreach ($bricks as $key => $brick) {
+            if ($brick['fields']) {
+                $bricks[$key]['fields'] = json_decode($brick['fields'], true);
+            }
+        }
+
+        return $this->_renderBricks($bricks, $data, $prefix, $suffix);
+    }
+
+
+    /**
+     * Получение блока по названию.
+     *
+     * @param array $name - название блока
+     * @param array $data - массив с дополнительными данными для блока
+     *
+     * @return string (html) || null
+     */
+
+    public function __getBricksGroup($groupName = false, $data = null, $prefix = '', $suffix = '')
     {
         return $this->_getBy('name', $name);
     }
@@ -66,7 +135,7 @@ class Bricks extends MY_Controller
      * @return string (html)
      */
 
-    public function _getContentBricks($content = null, $groupName = false, $data = null, $prefix = '', $suffix = '')
+    public function __getContentBricks($content = null, $groupName = false, $data = null, $prefix = '', $suffix = '')
     {
         if ($pageId = $this->_getPageId($content)) {
             $bricks = $this->_getPageBricks($pageId, $groupName, $data, $prefix, $suffix);
@@ -98,9 +167,9 @@ class Bricks extends MY_Controller
      * @return string (html)
      */
 
-    public function _getCategoryBricks($categoryId = false, $groupName = false, $data = null, $prefix = '', $suffix = '')
+    public function __getCategoryBricks($categoryId = false, $groupName = false, $data = null, $prefix = '', $suffix = '')
     {
-        return $this->_getBricks(
+        return $this->_getBricksByContent(
             'category',
             $categoryId ?: $this->_getCategoryIdFromCore(),
             $groupName,
@@ -123,9 +192,9 @@ class Bricks extends MY_Controller
      * @return string (html)
      */
 
-    public function _getPageBricks($pageId = false, $groupName = false, $data = null, $prefix = '', $suffix = '')
+    public function __getPageBricks($pageId = false, $groupName = false, $data = null, $prefix = '', $suffix = '')
     {
-        return $this->_getBricks(
+        return $this->_getBricksByContent(
             'page',
             $pageId ?: $this->_getPageIdFromCore(),
             $groupName,
@@ -155,20 +224,20 @@ class Bricks extends MY_Controller
 
 
     /**
-     * Общая логика для рендера блоков.
+     * Общая логика для получения блоков контента.
      */
 
-    private function _getBricks($type, $id, $groupName = false, $data = null, $prefix, $suffix)
+    private function _getBricksByContent($type, $id, $groupName = false, $data = null, $prefix, $suffix)
     {
-        $bricks = $this->load->model('BricksComplexModel')->get($type, $id, $groupName);
+        $bricks = $this->load->model('BricksComplexModel')->getByContent($type, $id, $groupName);
+
+        if (! $bricks) return;
 
         foreach ($bricks as $key => $brick) {
             if ($brick['fields']) {
                 $bricks[$key]['fields'] = json_decode($brick['fields'], true);
             }
         }
-
-        if (! $bricks) return;
 
         return $this->_renderBricks($bricks, $data, $prefix, $suffix);
     }
