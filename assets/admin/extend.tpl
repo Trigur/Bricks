@@ -51,7 +51,6 @@
 
                 {if $groups}
                     <td>
-                        <input type="hidden" name="bricks[id][]" value="{$brick['id']}">
                         <select class="js-bricks-group-select" name="bricks[group_id][]">
                             <option value="0">{lang('Выберите группу', 'bricks')}</option>
 
@@ -63,6 +62,7 @@
                 {/if}
 
                 <td class="t-a_c">
+                    <input type="hidden" name="bricks[id][]" value="{$brick['id']}">
                     <div class="btn btn-small btn-danger js-bricks-remove-btn"><i class="icon-trash"></i>{lang("Удалить", 'bricks')}</div>
                 </td>
             </tr>
